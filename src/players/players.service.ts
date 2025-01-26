@@ -51,4 +51,41 @@ export class PlayersService {
     player.price = price;
     return this.playersRepository.save(player);
   }
+
+    async getTransfers(filters: {
+      teamName?: string;
+      playerName?: string;
+      maxPrice?: number;
+    }): Promise<Player[]> {
+      try {
+        const query = this.playersRepository
+          .createQueryBuilder('player')
+          .leftJoinAndSelect('player.team', 'sellingTeam')
+          .where('player.isOnTransferList = :isOnTransferList', {
+            isOnTransferList: true,
+          });
+  
+        if (filters.teamName) {
+          query.andWhere('sellingTeam.name LIKE :teamName', {
+            teamName: `%${filters.teamName}%`,
+          });
+        }
+  
+        if (filters.playerName) {
+          query.andWhere('player.name LIKE :playerName', {
+            playerName: `%${filters.playerName}%`,
+          });
+        }
+  
+        if (filters.maxPrice) {
+          query.andWhere('player.price <= :maxPrice', {
+            maxPrice: filters.maxPrice,
+          });
+        }
+  
+        return query.getRawMany();
+      } catch (error) {
+        throw error;
+      }
+    }
 }

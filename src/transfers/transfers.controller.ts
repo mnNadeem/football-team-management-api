@@ -14,13 +14,6 @@ import { AuthenticationGuard } from 'src/guards/authentication.guard';
 export class TransfersController {
   constructor(private readonly transfersService: TransfersService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all transfers' })
-  @ApiResponse({ status: 200, description: 'Return all transfers.' })
-  async getTransfers(@Query() query: GetTransfersDto) {
-    return this.transfersService.getTransfers(query);
-  }
-
   @Post(':playerId/buy')
   @UseGuards(AuthenticationGuard)
   @ApiBearerAuth()
